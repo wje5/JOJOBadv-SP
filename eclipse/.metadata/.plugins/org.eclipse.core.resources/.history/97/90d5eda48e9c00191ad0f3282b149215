@@ -1,0 +1,563 @@
+/*     */ package src.jojobadv.Entities;
+/*     */ 
+/*     */ import cpw.mods.fml.relauncher.Side;
+/*     */ import cpw.mods.fml.relauncher.SideOnly;
+/*     */ import java.util.List;
+/*     */ import net.minecraft.block.Block;
+/*     */ import net.minecraft.entity.Entity;
+/*     */ import net.minecraft.entity.EntityLivingBase;
+/*     */ import net.minecraft.entity.IProjectile;
+/*     */ import net.minecraft.entity.player.EntityPlayer;
+/*     */ import net.minecraft.init.Blocks;
+/*     */ import net.minecraft.item.ItemStack;
+/*     */ import net.minecraft.nbt.NBTTagCompound;
+/*     */ import net.minecraft.util.AxisAlignedBB;
+/*     */ import net.minecraft.util.DamageSource;
+/*     */ import net.minecraft.util.MathHelper;
+/*     */ import net.minecraft.util.MovingObjectPosition;
+/*     */ import net.minecraft.util.Vec3;
+/*     */ import net.minecraft.world.World;
+/*     */ import src.jojobadv.Items.JojoBAdvItems;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class EntityKnife
+/*     */   extends Entity
+/*     */   implements IProjectile
+/*     */ {
+/*  28 */   private int xTile = -1;
+/*  29 */   private int yTile = -1;
+/*  30 */   private int zTile = -1;
+/*     */   
+/*     */   private Block inTile;
+/*     */   
+/*     */   private int inData;
+/*     */   
+/*     */   private boolean inGround;
+/*     */   
+/*     */   public int canBePickedUp;
+/*     */   
+/*     */   public int arrowShake;
+/*     */   
+/*     */   public EntityLivingBase shootingEntity;
+/*     */   private int ticksInGround;
+/*     */   private int ticksInAir;
+/*  45 */   private double damage = 2.0D;
+/*     */ 
+/*     */   
+/*     */   private int knockbackStrength;
+/*     */ 
+/*     */   
+/*     */   public EntityKnife(World par1World) {
+/*  52 */     super(par1World);
+/*  53 */     this.renderDistanceWeight = 10.0D;
+/*  54 */     setSize(0.5F, 0.5F);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public EntityKnife(World par1World, double par2, double par4, double par6) {
+/*  59 */     super(par1World);
+/*  60 */     this.renderDistanceWeight = 10.0D;
+/*  61 */     setSize(0.2F, 0.4F);
+/*  62 */     setPosition(par2, par4, par6);
+/*  63 */     this.yOffset = 0.0F;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public EntityKnife(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase par3EntityLivingBase, float par4, float par5) {
+/*  68 */     super(par1World);
+/*  69 */     this.renderDistanceWeight = 10.0D;
+/*  70 */     this.shootingEntity = par2EntityLivingBase;
+/*     */     
+/*  72 */     if (par2EntityLivingBase instanceof EntityPlayer)
+/*     */     {
+/*  74 */       this.canBePickedUp = 1;
+/*     */     }
+/*     */     
+/*  77 */     this.posY = par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight() - 0.10000000149011612D;
+/*  78 */     double d0 = par3EntityLivingBase.posX - par2EntityLivingBase.posX;
+/*  79 */     double d1 = par3EntityLivingBase.boundingBox.minY + (par3EntityLivingBase.height / 3.0F) - this.posY;
+/*  80 */     double d2 = par3EntityLivingBase.posZ - par2EntityLivingBase.posZ;
+/*  81 */     double d3 = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+/*     */     
+/*  83 */     if (d3 >= 1.0E-7D) {
+/*     */       
+/*  85 */       float f2 = (float)(Math.atan2(d2, d0) * 180.0D / Math.PI) - 90.0F;
+/*  86 */       float f3 = (float)-(Math.atan2(d1, d3) * 180.0D / Math.PI);
+/*  87 */       double d4 = d0 / d3;
+/*  88 */       double d5 = d2 / d3;
+/*  89 */       setLocationAndAngles(par2EntityLivingBase.posX + d4, this.posY, par2EntityLivingBase.posZ + d5, f2, f3);
+/*  90 */       this.yOffset = 0.0F;
+/*  91 */       float f4 = (float)d3 * 0.2F;
+/*  92 */       setThrowableHeading(d0, d1 + f4, d2, par4, par5);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public EntityKnife(World par1World, EntityLivingBase par2EntityLivingBase, float par3) {
+/*  98 */     super(par1World);
+/*  99 */     this.renderDistanceWeight = 10.0D;
+/* 100 */     this.shootingEntity = par2EntityLivingBase;
+/*     */     
+/* 102 */     if (par2EntityLivingBase instanceof EntityPlayer)
+/*     */     {
+/* 104 */       this.canBePickedUp = 1;
+/*     */     }
+/*     */     
+/* 107 */     setSize(0.5F, 0.5F);
+/* 108 */     setLocationAndAngles(par2EntityLivingBase.posX, par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight(), par2EntityLivingBase.posZ, par2EntityLivingBase.rotationYaw, par2EntityLivingBase.rotationPitch);
+/* 109 */     this.posX -= (MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
+/* 110 */     this.posY -= 0.10000000149011612D;
+/* 111 */     this.posZ -= (MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
+/* 112 */     setPosition(this.posX, this.posY, this.posZ);
+/* 113 */     this.yOffset = 0.0F;
+/* 114 */     this.motionX = (-MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F));
+/* 115 */     this.motionZ = (MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F));
+/* 116 */     this.motionY = -MathHelper.sin(this.rotationPitch / 180.0F * 3.1415927F);
+/* 117 */     setThrowableHeading(this.motionX, this.motionY, this.motionZ, par3 * 1.5F, 1.0F);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/* 122 */   protected void entityInit() { this.dataWatcher.addObject(16, Byte.valueOf((byte)0)); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setThrowableHeading(double par1, double par3, double par5, float par7, float par8) {
+/* 130 */     float f2 = MathHelper.sqrt_double(par1 * par1 + par3 * par3 + par5 * par5);
+/* 131 */     par1 /= f2;
+/* 132 */     par3 /= f2;
+/* 133 */     par5 /= f2;
+/* 134 */     par1 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : true) * 0.007499999832361937D * par8;
+/* 135 */     par3 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : true) * 0.007499999832361937D * par8;
+/* 136 */     par5 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : true) * 0.007499999832361937D * par8;
+/* 137 */     par1 *= par7;
+/* 138 */     par3 *= par7;
+/* 139 */     par5 *= par7;
+/* 140 */     this.motionX = par1;
+/* 141 */     this.motionY = par3;
+/* 142 */     this.motionZ = par5;
+/* 143 */     float f3 = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
+/* 144 */     this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(par1, par5) * 180.0D / Math.PI);
+/* 145 */     this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(par3, f3) * 180.0D / Math.PI);
+/* 146 */     this.ticksInGround = 0;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public void setPositionAndRotation2(double par1, double par3, double par5, float par7, float par8, int par9) {
+/* 151 */     setPosition(par1, par3, par5);
+/* 152 */     setRotation(par7, par8);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void onUpdate() {
+/* 160 */     super.onUpdate();
+/*     */     
+/* 162 */     if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
+/*     */       
+/* 164 */       float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+/* 165 */       this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+/* 166 */       this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(this.motionY, f) * 180.0D / Math.PI);
+/*     */     } 
+/*     */     
+/* 169 */     Block blockA = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+/*     */     
+/* 171 */     if (blockA != Blocks.air || blockA != Blocks.tallgrass) {
+/*     */       
+/* 173 */       blockA.setBlockBoundsBasedOnState(this.worldObj, this.xTile, this.yTile, this.zTile);
+/* 174 */       AxisAlignedBB axisalignedbb = blockA.getCollisionBoundingBoxFromPool(this.worldObj, this.xTile, this.yTile, this.zTile);
+/*     */       
+/* 176 */       if (axisalignedbb != null && axisalignedbb.isVecInside(Vec3.createVectorHelper(this.posX, this.posY, this.posZ)))
+/*     */       {
+/* 178 */         this.inGround = true;
+/*     */       }
+/*     */     } 
+/*     */     
+/* 182 */     if (this.arrowShake > 0)
+/*     */     {
+/* 184 */       this.arrowShake--;
+/*     */     }
+/*     */     
+/* 187 */     if (this.inGround) {
+/*     */       
+/* 189 */       Block j = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+/* 190 */       int k = this.worldObj.getBlockMetadata(this.xTile, this.yTile, this.zTile);
+/*     */       
+/* 192 */       if (j == this.inTile && k == this.inData)
+/*     */       {
+/* 194 */         this.ticksInGround++;
+/* 195 */         if (this.ticksInGround == 1200)
+/*     */         {
+/* 197 */           setDead();
+/*     */         }
+/*     */       }
+/*     */       else
+/*     */       {
+/* 202 */         this.inGround = false;
+/* 203 */         this.motionX *= (this.rand.nextFloat() * 0.2F);
+/* 204 */         this.motionY *= (this.rand.nextFloat() * 0.2F);
+/* 205 */         this.motionZ *= (this.rand.nextFloat() * 0.2F);
+/* 206 */         this.ticksInGround = 0;
+/* 207 */         this.ticksInAir = 0;
+/*     */       }
+/*     */     
+/*     */     } else {
+/*     */       
+/* 212 */       this.ticksInAir++;
+/* 213 */       Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
+/* 214 */       Vec3 vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+/* 215 */       MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31, false);
+/* 216 */       vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
+/* 217 */       vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+/*     */       
+/* 219 */       if (movingobjectposition != null)
+/*     */       {
+/* 221 */         vec31 = Vec3.createVectorHelper(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
+/*     */       }
+/*     */       
+/* 224 */       Entity entity = null;
+/* 225 */       List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+/* 226 */       double d0 = 0.0D;
+/*     */       
+/*     */       int l;
+/*     */       
+/* 230 */       for (l = 0; l < list.size(); l++) {
+/*     */         
+/* 232 */         Entity entity1 = (Entity)list.get(l);
+/*     */         
+/* 234 */         if (entity1.canBeCollidedWith() && (entity1 != this.shootingEntity || !(entity1 instanceof EntityKnife) || this.ticksInAir >= 5)) {
+/*     */           
+/* 236 */           float f1 = 0.3F;
+/* 237 */           AxisAlignedBB axisalignedbb1 = entity1.boundingBox.expand(f1, f1, f1);
+/* 238 */           MovingObjectPosition movingobjectposition1 = axisalignedbb1.calculateIntercept(vec3, vec31);
+/*     */           
+/* 240 */           if (movingobjectposition1 != null) {
+/*     */             
+/* 242 */             double d1 = vec3.distanceTo(movingobjectposition1.hitVec);
+/*     */             
+/* 244 */             if (d1 < d0 || d0 == 0.0D) {
+/*     */               
+/* 246 */               entity = entity1;
+/* 247 */               d0 = d1;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 253 */       if (entity != null)
+/*     */       {
+/* 255 */         movingobjectposition = new MovingObjectPosition(entity);
+/*     */       }
+/*     */       
+/* 258 */       if (movingobjectposition != null && movingobjectposition.entityHit != null && movingobjectposition.entityHit instanceof EntityPlayer) {
+/*     */         
+/* 260 */         EntityPlayer entityplayer = (EntityPlayer)movingobjectposition.entityHit;
+/*     */         
+/* 262 */         if (entityplayer.capabilities.disableDamage || entityplayer == this.shootingEntity)
+/*     */         {
+/* 264 */           movingobjectposition = null;
+/*     */         }
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 271 */       if (movingobjectposition != null)
+/*     */       {
+/* 273 */         if (movingobjectposition.entityHit != null) {
+/*     */           
+/* 275 */           if (!this.worldObj.isRemote)
+/*     */           {
+/* 277 */             if (movingobjectposition.entityHit instanceof EntityOneStand)
+/*     */             {
+/* 279 */               EntityOneStand hamonuser = (EntityOneStand)movingobjectposition.entityHit;
+/* 280 */               if (hamonuser.getMaster() == this.shootingEntity)
+/*     */               {
+/* 282 */                 movingobjectposition = null;
+/*     */               }
+/*     */             }
+/*     */             else
+/*     */             {
+/* 287 */               movingobjectposition.entityHit.hurtResistantTime = 0;
+/* 288 */               if (movingobjectposition.entityHit instanceof Entityhamonuser) {
+/*     */                 
+/* 290 */                 Entityhamonuser hamonuser = (Entityhamonuser)movingobjectposition.entityHit;
+/* 291 */                 if (hamonuser.getOwner() == this.shootingEntity)
+/*     */                 {
+/* 293 */                   movingobjectposition = null;
+/*     */                 }
+/* 295 */                 else if (this.rand.nextInt(9) == 1)
+/*     */                 {
+/* 297 */                   movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 3.0F);
+/*     */                 }
+/*     */                 else
+/*     */                 {
+/* 301 */                   movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 1.0F);
+/*     */                 }
+/*     */               
+/* 304 */               } else if (movingobjectposition.entityHit instanceof net.minecraft.entity.monster.EntityMob) {
+/*     */                 
+/* 306 */                 movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 3.0F);
+/*     */               }
+/* 308 */               else if (movingobjectposition.entityHit instanceof EntityPlayer) {
+/*     */                 
+/* 310 */                 if (this.rand.nextInt(9) == 1)
+/*     */                 {
+/* 312 */                   movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 3.0F);
+/*     */                 }
+/*     */                 else
+/*     */                 {
+/* 316 */                   movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 1.0F);
+/*     */                 
+/*     */                 }
+/*     */               
+/*     */               }
+/* 321 */               else if (this.rand.nextInt(9) == 1) {
+/*     */                 
+/* 323 */                 movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 3.0F);
+/*     */               }
+/*     */               else {
+/*     */                 
+/* 327 */                 movingobjectposition.entityHit.attackEntityFrom(DamageSource.causeMobDamage(this.shootingEntity), 1.0F);
+/*     */               }
+/*     */             
+/*     */             }
+/*     */           
+/*     */           }
+/*     */         }
+/*     */         else {
+/*     */           
+/* 336 */           this.xTile = movingobjectposition.blockX;
+/* 337 */           this.yTile = movingobjectposition.blockY;
+/* 338 */           this.zTile = movingobjectposition.blockZ;
+/* 339 */           this.inTile = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+/* 340 */           this.inData = this.worldObj.getBlockMetadata(this.xTile, this.yTile, this.zTile);
+/* 341 */           this.motionX = (float)(movingobjectposition.hitVec.xCoord - this.posX);
+/* 342 */           this.motionY = (float)(movingobjectposition.hitVec.yCoord - this.posY);
+/* 343 */           this.motionZ = (float)(movingobjectposition.hitVec.zCoord - this.posZ);
+/* 344 */           float f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+/* 345 */           this.posX -= this.motionX / f2 * 0.05000000074505806D;
+/* 346 */           this.posY -= this.motionY / f2 * 0.05000000074505806D;
+/* 347 */           this.posZ -= this.motionZ / f2 * 0.05000000074505806D;
+/* 348 */           playSound("random.bowhit", 1.0F, 1.2F / (this.rand.nextFloat() * 0.2F + 0.9F));
+/* 349 */           this.inGround = true;
+/* 350 */           this.arrowShake = 7;
+/* 351 */           setIsCritical(false);
+/*     */           
+/* 353 */           if (this.inTile != Blocks.air) {
+/*     */             
+/* 355 */             if (this.inTile == Blocks.reeds || this.inTile == Blocks.tripwire) {
+/*     */               
+/* 357 */               this.worldObj.setBlockToAir(this.xTile, this.yTile, this.zTile);
+/* 358 */               this.inTile.dropBlockAsItem(this.worldObj, this.xTile, this.yTile, this.zTile, this.inData, 1);
+/*     */             } 
+/* 360 */             this.inTile.onEntityCollidedWithBlock(this.worldObj, this.xTile, this.yTile, this.zTile, this);
+/*     */           } 
+/*     */         } 
+/*     */       }
+/*     */       
+/* 365 */       if (getIsCritical())
+/*     */       {
+/* 367 */         for (l = 0; l < 4; l++)
+/*     */         {
+/* 369 */           this.worldObj.spawnParticle("crit", this.posX + this.motionX * l / 4.0D, this.posY + this.motionY * l / 4.0D, this.posZ + this.motionZ * l / 4.0D, -this.motionX, -this.motionY + 0.2D, -this.motionZ);
+/*     */         }
+/*     */       }
+/*     */       
+/* 373 */       this.posX += this.motionX;
+/* 374 */       this.posY += this.motionY;
+/* 375 */       this.posZ += this.motionZ;
+/* 376 */       float f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+/* 377 */       this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+/*     */       
+/* 379 */       for (this.rotationPitch = (float)(Math.atan2(this.motionY, f2) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 384 */       while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+/*     */       {
+/* 386 */         this.prevRotationPitch += 360.0F;
+/*     */       }
+/*     */       
+/* 389 */       while (this.rotationYaw - this.prevRotationYaw < -180.0F)
+/*     */       {
+/* 391 */         this.prevRotationYaw -= 360.0F;
+/*     */       }
+/*     */       
+/* 394 */       while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
+/*     */       {
+/* 396 */         this.prevRotationYaw += 360.0F;
+/*     */       }
+/*     */       
+/* 399 */       this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
+/* 400 */       this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
+/* 401 */       float f4 = 0.99F;
+/* 402 */       float f1 = 0.05F;
+/*     */       
+/* 404 */       if (isInWater()) {
+/*     */         
+/* 406 */         for (int j1 = 0; j1 < 4; j1++) {
+/*     */           
+/* 408 */           float f3 = 0.25F;
+/* 409 */           this.worldObj.spawnParticle("bubble", this.posX - this.motionX * f3, this.posY - this.motionY * f3, this.posZ - this.motionZ * f3, this.motionX, this.motionY, this.motionZ);
+/*     */         } 
+/*     */         
+/* 412 */         f4 = 0.8F;
+/*     */       } 
+/*     */       
+/* 415 */       this.motionX *= f4;
+/* 416 */       this.motionY *= f4;
+/* 417 */       this.motionZ *= f4;
+/* 418 */       this.motionY -= f1;
+/* 419 */       setPosition(this.posX, this.posY, this.posZ);
+/* 420 */       setPositionAndRotation2(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch, 4);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+/* 429 */     par1NBTTagCompound.setShort("xTile", (short)this.xTile);
+/* 430 */     par1NBTTagCompound.setShort("yTile", (short)this.yTile);
+/* 431 */     par1NBTTagCompound.setShort("zTile", (short)this.zTile);
+/* 432 */     par1NBTTagCompound.setByte("inTile", (byte)Block.getIdFromBlock(this.inTile));
+/* 433 */     par1NBTTagCompound.setByte("inData", (byte)this.inData);
+/* 434 */     par1NBTTagCompound.setByte("shake", (byte)this.arrowShake);
+/* 435 */     par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
+/* 436 */     par1NBTTagCompound.setByte("pickup", (byte)this.canBePickedUp);
+/* 437 */     par1NBTTagCompound.setDouble("damage", this.damage);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+/* 445 */     this.xTile = par1NBTTagCompound.getShort("xTile");
+/* 446 */     this.yTile = par1NBTTagCompound.getShort("yTile");
+/* 447 */     this.zTile = par1NBTTagCompound.getShort("zTile");
+/* 448 */     this.inTile = Block.getBlockById(par1NBTTagCompound.getByte("inTile"));
+/* 449 */     this.inData = par1NBTTagCompound.getByte("inData") & 0xFF;
+/* 450 */     this.arrowShake = par1NBTTagCompound.getByte("shake") & 0xFF;
+/* 451 */     this.inGround = (par1NBTTagCompound.getByte("inGround") == 1);
+/*     */     
+/* 453 */     if (par1NBTTagCompound.hasKey("damage"))
+/*     */     {
+/* 455 */       this.damage = par1NBTTagCompound.getDouble("damage");
+/*     */     }
+/*     */     
+/* 458 */     if (par1NBTTagCompound.hasKey("pickup")) {
+/*     */       
+/* 460 */       this.canBePickedUp = par1NBTTagCompound.getByte("pickup");
+/*     */     }
+/* 462 */     else if (par1NBTTagCompound.hasKey("player")) {
+/*     */       
+/* 464 */       this.canBePickedUp = par1NBTTagCompound.getBoolean("player") ? 1 : 0;
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void onCollideWithPlayer(EntityPlayer par1EntityPlayer) {
+/* 473 */     if (!this.worldObj.isRemote && this.inGround && this.arrowShake <= 0) {
+/*     */       
+/* 475 */       boolean flag = (this.canBePickedUp == 1 || (this.canBePickedUp == 2 && par1EntityPlayer.capabilities.isCreativeMode));
+/*     */       
+/* 477 */       if (this.canBePickedUp == 1 && !par1EntityPlayer.inventory.addItemStackToInventory(new ItemStack(JojoBAdvItems.knife, true)))
+/*     */       {
+/* 479 */         flag = false;
+/*     */       }
+/*     */       
+/* 482 */       if (flag) {
+/*     */         
+/* 484 */         playSound("random.pop", 0.2F, ((this.rand.nextFloat() - this.rand.nextFloat()) * 0.7F + 1.0F) * 2.0F);
+/* 485 */         par1EntityPlayer.onItemPickup(this, 1);
+/* 486 */         setDead();
+/*     */       } 
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 497 */   protected boolean canTriggerWalking() { return false; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   @SideOnly(Side.CLIENT)
+/* 503 */   public float getShadowSize() { return 0.1F; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 508 */   public void setDamage(double par1) { this.damage = par1; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 513 */   public double getDamage() { return this.damage; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 521 */   public void setKnockbackStrength(int par1) { this.knockbackStrength = par1; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 529 */   public boolean canAttackWithItem() { return false; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setIsCritical(boolean par1) {
+/* 537 */     byte b0 = this.dataWatcher.getWatchableObjectByte(16);
+/*     */     
+/* 539 */     if (par1) {
+/*     */       
+/* 541 */       this.dataWatcher.updateObject(16, Byte.valueOf((byte)(b0 | true)));
+/*     */     }
+/*     */     else {
+/*     */       
+/* 545 */       this.dataWatcher.updateObject(16, Byte.valueOf((byte)(b0 & 0xFFFFFFFE)));
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean getIsCritical() {
+/* 554 */     byte b0 = this.dataWatcher.getWatchableObjectByte(16);
+/* 555 */     return ((b0 & true) != 0);
+/*     */   }
+/*     */ }
+
+
+/* Location:              /Volumes/NO NAME/JojoBAdv-0.2.4-1.7.10-deobf.jar!/src/jojobadv/Entities/EntityKnife.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.0.2
+ */

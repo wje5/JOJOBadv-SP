@@ -1,0 +1,88 @@
+/*    */ package src.jojobadv.Models;
+/*    */ 
+/*    */ import net.minecraft.client.model.ModelBase;
+/*    */ import net.minecraft.client.model.ModelRenderer;
+/*    */ import net.minecraft.entity.Entity;
+/*    */ 
+/*    */ 
+/*    */ public class ModelMagicians_Red_fire
+/*    */   extends ModelBase
+/*    */ {
+/*    */   ModelRenderer Shape1;
+/*    */   ModelRenderer Shape2;
+/*    */   ModelRenderer Shape3;
+/*    */   ModelRenderer Shape4;
+/*    */   ModelRenderer Shape5;
+/*    */   ModelRenderer Shape6;
+/*    */   
+/*    */   public ModelMagicians_Red_fire() {
+/* 19 */     this.textureWidth = 64;
+/* 20 */     this.textureHeight = 32;
+/*    */     
+/* 22 */     this.Shape1 = new ModelRenderer(this, 0, 0);
+/* 23 */     this.Shape1.addBox(-3.0F, -1.0F, 0.0F, 5, 1, 1);
+/* 24 */     this.Shape1.setRotationPoint(0.0F, 0.0F, 0.0F);
+/* 25 */     this.Shape1.setTextureSize(64, 32);
+/* 26 */     this.Shape1.mirror = true;
+/* 27 */     setRotation(this.Shape1, 0.0F, 0.0F, 0.0F);
+/* 28 */     this.Shape2 = new ModelRenderer(this, 0, 0);
+/* 29 */     this.Shape2.addBox(2.0F, 0.0F, 0.0F, 1, 4, 1);
+/* 30 */     this.Shape2.setRotationPoint(0.0F, 0.0F, 0.0F);
+/* 31 */     this.Shape2.setTextureSize(64, 32);
+/* 32 */     this.Shape2.mirror = true;
+/* 33 */     setRotation(this.Shape2, 0.0F, 0.0F, 0.0F);
+/* 34 */     this.Shape3 = new ModelRenderer(this, 0, 0);
+/* 35 */     this.Shape3.addBox(-4.0F, 0.0F, 0.0F, 1, 4, 1);
+/* 36 */     this.Shape3.setRotationPoint(0.0F, 0.0F, 0.0F);
+/* 37 */     this.Shape3.setTextureSize(64, 32);
+/* 38 */     this.Shape3.mirror = true;
+/* 39 */     setRotation(this.Shape3, 0.0F, 0.0F, 0.0F);
+/* 40 */     this.Shape4 = new ModelRenderer(this, 0, 0);
+/* 41 */     this.Shape4.addBox(-5.0F, 5.0F, 0.0F, 9, 1, 1);
+/* 42 */     this.Shape4.setRotationPoint(0.0F, 0.0F, 0.0F);
+/* 43 */     this.Shape4.setTextureSize(64, 32);
+/* 44 */     this.Shape4.mirror = true;
+/* 45 */     setRotation(this.Shape4, 0.0F, 0.0F, 0.0F);
+/* 46 */     this.Shape5 = new ModelRenderer(this, 0, 0);
+/* 47 */     this.Shape5.addBox(-1.0F, 5.0F, 0.0F, 1, 5, 1);
+/* 48 */     this.Shape5.setRotationPoint(0.0F, 0.0F, 0.0F);
+/* 49 */     this.Shape5.setTextureSize(64, 32);
+/* 50 */     this.Shape5.mirror = true;
+/* 51 */     setRotation(this.Shape5, 0.0F, 0.0F, 0.0F);
+/* 52 */     this.Shape6 = new ModelRenderer(this, 0, 0);
+/* 53 */     this.Shape6.addBox(-3.0F, 4.0F, 0.0F, 5, 1, 1);
+/* 54 */     this.Shape6.setRotationPoint(0.0F, 0.0F, 0.0F);
+/* 55 */     this.Shape6.setTextureSize(64, 32);
+/* 56 */     this.Shape6.mirror = true;
+/* 57 */     setRotation(this.Shape6, 0.0F, 0.0F, 0.0F);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   public void render(Entity entity, float f, float f1, float f2, float f3, float f4, float f5) {
+/* 62 */     super.render(entity, f, f1, f2, f3, f4, f5);
+/* 63 */     setRotationAngles(f, f1, f2, f3, f4, f5, entity);
+/* 64 */     this.Shape1.render(f5);
+/* 65 */     this.Shape2.render(f5);
+/* 66 */     this.Shape3.render(f5);
+/* 67 */     this.Shape4.render(f5);
+/* 68 */     this.Shape5.render(f5);
+/* 69 */     this.Shape6.render(f5);
+/*    */   }
+/*    */ 
+/*    */   
+/*    */   private void setRotation(ModelRenderer model, float x, float y, float z) {
+/* 74 */     model.rotateAngleX = x;
+/* 75 */     model.rotateAngleY = y;
+/* 76 */     model.rotateAngleZ = z;
+/*    */   }
+/*    */ 
+/*    */ 
+/*    */   
+/* 81 */   public void setRotationAngles(float f, float f1, float f2, float f3, float f4, float f5, Entity ent) { super.setRotationAngles(f, f1, f2, f3, f4, f5, ent); }
+/*    */ }
+
+
+/* Location:              /Volumes/NO NAME/JojoBAdv-0.2.4-1.7.10-deobf.jar!/src/jojobadv/Models/ModelMagicians_Red_fire.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.0.2
+ */

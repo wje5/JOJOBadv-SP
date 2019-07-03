@@ -1,0 +1,140 @@
+#English File
+
+#Tabs
+itemGroup.tabJojoBAdv=史蒂夫的奇妙冒险
+
+#KeyBindings
+key.categories.JojosBAdv=史蒂夫的奇妙冒险
+key.spawnStand.desc=召唤替身
+
+#Achievements
+achievement.page.jojobadvmod_custom=自定义成就
+
+#ExtraText
+stands.jojobadv.Act.txt=ACT
+stands.jojobadv.Exp.txt=Exp
+
+#ChatMessages
+msg.jojobadv.starplatinum_orarush.txt=Ora Rush!
+msg.jojobadv.magicianred_crossfire.txt=Cross Fire!
+msg.jojobadv.theworld_stoptime.txt=ZA WORUDO!!
+msg.jojobadv.hunger.txt=饥饿时无法攻击。
+msg.jojobadv.notenoughexp.txt=没有足够的经验值!
+msg.jojobadv.standalready.txt=你已经拥有了替身。
+msg.jojobadv.fusion.txt=攻击模式:恢复
+msg.jojobadv.destruction.txt=攻击模式:毁灭
+msg.jojobadv.sneaktimer.txt=Sneak Timer = 
+msg.jojobadv.seconds.txt=秒。
+
+#Items
+item.item_vampireblood.name=吸血鬼之血
+item.item_hardArrow.name=Hard Arrow
+item.item_stoneMask.name=石鬼面
+item.item_emperor_stand.name=皇帝
+item.item_sheerheart_attack.name=穿心攻击
+item.item_bombswitch.name=Bomb Switch
+item.item_thehand_stand.name=轰炸空间
+item.item_knife.name=小刀
+item.stand_Arrow.name=箭
+item.stand_SC.name=银色战车
+item.stand_MR.name=魔术师之红
+item.stand_SP.name=白金之星
+item.stand_TW.name=世界
+item.stand_E.name=皇帝
+item.stand_CD.name=疯狂钻石
+item.stand_EC.name=回声
+item.stand_KQ.name=杀手皇后
+item.stand_TH.name=轰炸空间
+item.stand_SF.name=钢链手指
+item.stand_TF.name=愚者
+item.stand_HG.name=法皇之绿
+item.item_tempStandSummon.name=用于调试的创造模式物品
+item.item_discStand.name=替身 DISC
+
+#Blocks
+tile.custom.name=自定义方块
+
+#Entity
+entity.Diavolo.name=迪亚波罗
+entity.Hamon.name=波纹
+entity.Hamonuser.name=波纹使者
+entity.Vampire_laser.name=Vampire's Laser
+entity.Vampirepower.name=Vampire's Power
+entity.Vampire.name=Vampire Thrall
+entity.Stand.name=替身
+entity.Star_Platinum.name=白金之星
+entity.Star Platinum punch.name=白金之星的拳头
+entity.Magician's Red.name=魔术师之红
+entity.Magician's Red-fire.name=魔术师之红的火焰
+entity.Silver Chariot.name=银色战车
+entity.Silver Chariot blade.name=银色战车的剑
+entity.The World.name=世界
+entity.The World punch.name=世界的拳头
+entity.Emperor.name=皇帝
+entity.Emperor - bullet.name= 皇帝的子弹
+entity.Crazy Diamond.name=疯狂钻石
+entity.Crazy Diamond - punch.name= 疯狂钻石的拳头
+entity.Echoes Egg.name=回音蛋
+entity.Echoes Act1.name=回音 Act1
+entity.Echoes sound.name=回音的声音
+entity.Echoes Act2.name=回音 Act2
+entity.Echoes Act3.name=回音 Act3
+entity.Echoes Act3 punch.name=回音 Act3 的拳头
+entity.Killer Queen.name=杀手皇后
+entity.Sheer Heart Attack_target.name=穿心攻击的目标
+entity.Sheer Heart Attack.name=穿心攻击
+entity.In Bomb.name=内炸弹
+entity.Out Bomb.name=外炸弹
+entity.Killer Queen - punch.name=杀手皇后的拳头
+entity.The Hand.name=轰炸空间
+entity.The Hand - punch.name=轰炸空间的拳头
+entity.Sticky Fingers.name=钢链手指
+entity.Sticky Fingers - punch.name=钢链手指的拳头
+entity.Knife.name=小刀
+entity.The Fool.name=愚者
+entity.Dark Blue Moon.name=暗蓝之月
+entity.Dark Blue Moon - cutter.name=暗蓝之月的鳞片
+entity.Hierophant Green.name=法皇之绿
+entity.Hierophant Green - emerald splash.name=绿宝石水花
+
+#entityregistry
+entity.jojobadv.Diavolo.name=迪亚波罗
+entity.jojobadv.Hamon.name=波纹
+entity.jojobadv.Hamonuser.name=波纹使者
+entity.jojobadv.Vampire_laser.name=Vampire's Laser
+entity.jojobadv.Vampirepower.name=Vampire's Power
+entity.jojobadv.Vampire.name=吸血鬼
+entity.jojobadv.Stand.name=替身
+entity.jojobadv.Star_Platinum.name=白金之星
+entity.jojobadv.Star Platinum punch.name=白金之星的拳头
+entity.jojobadv.Magician's Red.name=魔术师之红
+entity.jojobadv.Magician's Red-fire.name=魔术师之红的火焰
+entity.jojobadv.Silver Chariot.name=银色战车
+entity.jojobadv.Silver Chariot blade.name=银色战车的剑
+entity.jojobadv.The World.name=世界
+entity.jojobadv.The World punch.name=世界的拳头
+entity.jojobadv.Emperor.name=皇帝
+entity.jojobadv.Emperor - bullet.name= 皇帝的子弹
+entity.jojobadv.Crazy Diamond.name=疯狂钻石
+entity.jojobadv.Crazy Diamond - punch.name= 疯狂钻石的拳头
+entity.jojobadv.Echoes Egg.name=回音蛋
+entity.jojobadv.Echoes Act1.name= 回音 Act1
+entity.jojobadv.Echoes sound.name= 回音 Sound
+entity.jojobadv.Echoes Act2.name= 回音 Act2
+entity.jojobadv.Echoes Act3.name= 回音 Act3
+entity.jojobadv.Echoes Act3 punch.name=回音 Act3 的拳头
+entity.jojobadv.Killer Queen.name=杀手皇后
+entity.jojobadv.Sheer Heart Attack_target.name=穿心攻击的目标
+entity.jojobadv.Sheer Heart Attack.name=穿心攻击
+entity.jojobadv.In Bomb.name=内炸弹
+entity.jojobadv.Out Bomb.name=外炸弹
+entity.jojobadv.Killer Queen - punch.name=杀手皇后的拳头
+entity.jojobadv.The Hand.name=轰炸空间
+entity.jojobadv.Sticky Fingers.name=钢链手指
+entity.jojobadv.Sticky Fingers - punch.name=钢链手指的拳头
+entity.jojobadv.Knife.name=小刀
+entity.jojobadv.The Fool.name=愚者
+entity.jojobadv.Dark Blue Moon.name=暗蓝之月
+entity.jojobadv.Dark Blue Moon - cutter.name=暗蓝之月的鳞片
+entity.jojobadv.Hierophant Green.name=法皇之绿
+entity.jojobadv.Hierophant Green - emerald splash.name=绿宝石水花

@@ -1,0 +1,16 @@
+[
+{
+  "modid": "jojobadv",
+  "name": "Steve's Bizarre Adventure",
+  "description": "Jojo Bizarre Adventure mod, originally released by 'VG'.",
+  "version": "0.2.4",
+  "mcversion": "1.7.10",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["KnightDemon","3DPinball"],
+  "credits": "Original creator of the mod, 'VG'. A big thank you to both ba70000 and Mel for their bug reports and feedback.",
+  "logoFile": "assets/jojobadv/logoFile.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]

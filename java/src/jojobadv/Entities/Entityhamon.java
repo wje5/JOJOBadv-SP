@@ -1,0 +1,279 @@
+/*     */ package src.jojobadv.Entities;
+/*     */ 
+/*     */ import net.minecraft.entity.Entity;
+/*     */ import net.minecraft.entity.EntityCreature;
+/*     */ import net.minecraft.entity.EntityLivingBase;
+/*     */ import net.minecraft.entity.SharedMonsterAttributes;
+/*     */ import net.minecraft.entity.player.EntityPlayer;
+/*     */ import net.minecraft.nbt.NBTTagCompound;
+/*     */ import net.minecraft.potion.Potion;
+/*     */ import net.minecraft.potion.PotionEffect;
+/*     */ import net.minecraft.util.ChatComponentText;
+/*     */ import net.minecraft.util.DamageSource;
+/*     */ import net.minecraft.world.World;
+/*     */ import src.jojobadv.ModBase.SoundEvents;
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ public class Entityhamon
+/*     */   extends EntityCreature
+/*     */ {
+/*  26 */   protected EntityPlayer master = null;
+/*     */   protected boolean hamonOn = true;
+/*     */   String mastername;
+/*  29 */   protected int tick = 0;
+/*  30 */   private int standontick = 0;
+/*     */   
+/*  32 */   private int hamontimer = 0;
+/*     */   protected String spawnSound;
+/*     */   private EntityLivingBase forskillentity;
+/*  35 */   private int hamonPunchcharging = 0;
+/*  36 */   private int training = 0;
+/*     */ 
+/*     */   
+/*     */   public Entityhamon(World par1World) {
+/*  40 */     super(par1World);
+/*  41 */     setSize(0.1F, 0.1F);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  47 */   protected void entityInit() { super.entityInit(); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void playStepSound(int par1, int par2, int par3, int par4) {}
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*  57 */   public Entity getMaster() { return this.master; }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   protected void hamonSwitch() {
+/*  62 */     if (!this.worldObj.isRemote)
+/*     */     {
+/*  64 */       if (this.master.isSneaking()) {
+/*     */         
+/*  66 */         this.standontick++;
+/*  67 */         if (this.standontick <= 20)
+/*     */         {
+/*  69 */           if (this.master.swingProgressInt != 0)
+/*     */           {
+/*  71 */             this.tick++;
+/*  72 */             if (this.tick == 1)
+/*     */             {
+/*  74 */               this.hamonOn = !this.hamonOn;
+/*  75 */               if (this.hamonOn)
+/*     */               {
+/*  77 */                 this.worldObj.playSoundAtEntity(this.master, SoundEvents.breath.toString(), 1.0F, 1.0F);
+/*     */               
+/*     */               }
+/*     */             
+/*     */             }
+/*     */ 
+/*     */           
+/*     */           }
+/*     */         
+/*     */         }
+/*     */       }
+/*     */       else {
+/*     */         
+/*  90 */         this.standontick = 0;
+/*  91 */         this.tick = 0;
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public void onUpdate() {
+/*  98 */     super.onUpdate();
+/*  99 */     this.training++;
+/* 100 */     this.fallDistance = 0.0F;
+/* 101 */     if (!this.worldObj.isRemote)
+/*     */     {
+/* 103 */       if (this.master == null) {
+/*     */         
+/* 105 */         setmaster(this.mastername);
+/* 106 */         this.posY = -5.0D;
+/*     */       }
+/*     */       else {
+/*     */         
+/* 110 */         Entity entity = null;
+/* 111 */         for (int i1 = 0; i1 < this.master.worldObj.loadedEntityList.size(); i1++) {
+/*     */           
+/* 113 */           Entity entityplayer1 = (Entity)this.master.worldObj.loadedEntityList.get(i1);
+/* 114 */           double dst = entityplayer1.getDistanceSq(this.master.posX, this.master.posY, this.master.posZ);
+/* 115 */           double offdst = entityplayer1.getDistanceSq(this.master.posX, -5.0D, this.master.posZ);
+/* 116 */           double d2 = 25.132741228718345D;
+/* 117 */           entity = entityplayer1;
+/* 118 */           if (entity instanceof EntityOneStand) if (((dst <= 3.0D) ? true : false) ^ ((offdst <= 3.0D) ? true : false))
+/*     */             { 
+/* 120 */               if (!this.master.worldObj.isRemote)
+/*     */               {
+/* 122 */                 if (((EntityOneStand)entity).getMaster() == getMaster())
+/*     */                 {
+/* 124 */                   setDead();
+/*     */                 }
+/*     */               }
+/*     */             } 
+/*     */         } 
+/* 129 */         if (this.master.isDead)
+/*     */         {
+/* 131 */           setDead();
+/*     */         }
+/* 133 */         setPosition(this.master.posX, this.master.posY, this.master.posZ);
+/*     */         
+/* 135 */         if (((EntityPlayer)getMaster()).capabilities.isCreativeMode)
+/*     */         {
+/* 137 */           if (this.training < 12000)
+/*     */           {
+/* 139 */             this.training = 12000;
+/*     */           }
+/*     */         }
+/* 142 */         if (this.training == 12000) {
+/*     */           
+/* 144 */           this.master.addChatMessage(new ChatComponentText("ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½!"));
+/* 145 */           this.worldObj.playSoundAtEntity(this.master, SoundEvents.breath.toString(), 1.0F, 1.0F);
+/*     */         } 
+/* 147 */         if (this.training >= 12000) {
+/*     */           
+/* 149 */           hamonSwitch();
+/* 150 */           if (this.hamonOn) {
+/*     */             
+/* 152 */             hamonPower();
+/*     */           }
+/*     */           else {
+/*     */             
+/* 156 */             this.master.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).setBaseValue(0.0D);
+/*     */           } 
+/* 158 */           this.forskillentity = this.master.getLastAttacker();
+/* 159 */           if (this.master.getAir() == 1) {
+/*     */             
+/* 161 */             this.master.addChatMessage(new ChatComponentText("ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½Ò¸ï¿½ ï¿½Ê¿ï¿½ï¿½ï¿½Õ´Ï´ï¿½"));
+/* 162 */             this.hamonOn = false;
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */   
+/*     */   private void hamonPower() {
+/* 170 */     if (this.master.getFoodStats().getFoodLevel() > 0) {
+/*     */       
+/* 172 */       this.hamontimer++;
+/* 173 */       if (this.hamontimer == 120) {
+/*     */         
+/* 175 */         if (!this.master.capabilities.isCreativeMode)
+/*     */         {
+/* 177 */           this.master.getFoodStats().addStats(-1, 0.0F);
+/*     */         }
+/* 179 */         this.hamontimer = 0;
+/*     */       } 
+/* 181 */       this.master.addPotionEffect(new PotionEffect(Potion.moveSpeed.getId(), 40, 0));
+/* 182 */       this.master.addPotionEffect(new PotionEffect(Potion.resistance.getId(), 40, 1));
+/* 183 */       this.master.addPotionEffect(new PotionEffect(Potion.digSpeed.getId(), 40, 1));
+/* 184 */       this.master.getEntityAttribute(SharedMonsterAttributes.knockbackResistance).setBaseValue(1.0D);
+/*     */     }
+/*     */     else {
+/*     */       
+/* 188 */       this.master.addChatMessage(new ChatComponentText("ï¿½è°¡ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ä¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ò¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½"));
+/* 189 */       this.hamonOn = false;
+/*     */     } 
+/* 191 */     if (this.master.swingProgressInt != 0 && this.forskillentity != null && this.forskillentity.getHealth() > 0.0F && (this.master.getLastAttacker()).hurtResistantTime != 0)
+/*     */     {
+/* 193 */       if (this.forskillentity instanceof net.minecraft.entity.monster.EntityZombie && this.forskillentity instanceof net.minecraft.entity.monster.EntitySkeleton) {
+/*     */         
+/* 195 */         if (!this.worldObj.isRemote)
+/*     */         {
+/* 197 */           this.forskillentity.setFire(50);
+/* 198 */           this.worldObj.playSoundAtEntity(this.forskillentity, SoundEvents.hamonshock.toString(), 0.5F, 1.0F);
+/* 199 */           this.forskillentity.attackEntityFrom(DamageSource.inFire, 99.0F);
+/* 200 */           this.forskillentity.hurtResistantTime = 0;
+/* 201 */           this.forskillentity.motionX = 0.0D;
+/* 202 */           this.forskillentity.motionY += 0.1D;
+/* 203 */           this.forskillentity.motionZ = 0.0D;
+/*     */         }
+/*     */       
+/* 206 */       } else if (this.forskillentity instanceof EntityLivingBase) {
+/*     */         
+/* 208 */         if (!this.worldObj.isRemote) {
+/*     */           
+/* 210 */           this.forskillentity.setFire(2);
+/* 211 */           this.forskillentity.hurtResistantTime = 0;
+/* 212 */           this.forskillentity.motionX = 0.0D;
+/* 213 */           this.forskillentity.motionY += 0.1D;
+/* 214 */           this.forskillentity.motionZ = 0.0D;
+/*     */         } 
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */   
+/* 221 */   protected void setmaster(String par1Str) { this.master = this.worldObj.getPlayerEntityByName(par1Str); }
+/*     */ 
+/*     */   
+/*     */   protected String getmastername() {
+/* 225 */     if (!this.worldObj.isRemote) {
+/*     */       
+/* 227 */       if (this.master == null)
+/*     */       {
+/* 229 */         return this.mastername;
+/*     */       }
+/*     */ 
+/*     */ 
+/*     */       
+/* 234 */       return this.master.getDisplayName();
+/*     */     } 
+/*     */ 
+/*     */     
+/* 238 */     return "client";
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public void readEntityFromNBT(NBTTagCompound nbttagcompound) {
+/* 243 */     super.readEntityFromNBT(nbttagcompound);
+/* 244 */     if (!this.worldObj.isRemote) {
+/*     */       
+/* 246 */       this.mastername = nbttagcompound.getString("Owner");
+/* 247 */       setmaster(this.mastername);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void writeEntityToNBT(NBTTagCompound nbttagcompound) {
+/* 254 */     super.writeEntityToNBT(nbttagcompound);
+/* 255 */     if (!this.worldObj.isRemote)
+/*     */     {
+/* 257 */       if (getmastername() == null) {
+/*     */         
+/* 259 */         nbttagcompound.setString("Owner", "");
+/*     */       }
+/*     */       else {
+/*     */         
+/* 263 */         nbttagcompound.setString("Owner", getmastername());
+/* 264 */         System.out.println(getmastername() + "SAVE!!");
+/*     */       } 
+/*     */     }
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 272 */   public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) { return false; }
+/*     */ }
+
+
+/* Location:              /Volumes/NO NAME/JojoBAdv-0.2.4-1.7.10-deobf.jar!/src/jojobadv/Entities/Entityhamon.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.0.2
+ */

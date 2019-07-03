@@ -1,0 +1,643 @@
+/*     */ package src.jojobadv.Entities.Stands;
+/*     */ 
+/*     */ import cpw.mods.fml.relauncher.Side;
+/*     */ import cpw.mods.fml.relauncher.SideOnly;
+/*     */ import java.util.List;
+/*     */ import net.minecraft.block.Block;
+/*     */ import net.minecraft.entity.Entity;
+/*     */ import net.minecraft.entity.EntityLivingBase;
+/*     */ import net.minecraft.entity.IProjectile;
+/*     */ import net.minecraft.entity.player.EntityPlayer;
+/*     */ import net.minecraft.init.Blocks;
+/*     */ import net.minecraft.nbt.NBTTagCompound;
+/*     */ import net.minecraft.potion.Potion;
+/*     */ import net.minecraft.potion.PotionEffect;
+/*     */ import net.minecraft.util.AxisAlignedBB;
+/*     */ import net.minecraft.util.MathHelper;
+/*     */ import net.minecraft.util.MovingObjectPosition;
+/*     */ import net.minecraft.util.Vec3;
+/*     */ import net.minecraft.world.World;
+/*     */ 
+/*     */ public class EntityEchoes_sound
+/*     */   extends Entity
+/*     */   implements IProjectile {
+/*     */   boolean flag = true;
+/*  25 */   int timer = 0;
+/*  26 */   private int xTile = -1;
+/*  27 */   private int yTile = -1;
+/*  28 */   private int zTile = -1;
+/*     */   
+/*     */   private Block inTile;
+/*     */   
+/*     */   private int inData;
+/*     */   
+/*     */   private boolean inGround;
+/*     */   
+/*     */   public int canBePickedUp;
+/*     */   
+/*     */   public int arrowShake;
+/*     */   
+/*     */   public Entity shootingEntity;
+/*     */   
+/*     */   public EntityEchoesAct1 shootingStandact1;
+/*     */   public EntityEchoesAct2 shootingStandact2;
+/*     */   private int ticksInGround;
+/*     */   private int ticksInAir;
+/*  46 */   private double damage = 2.5D;
+/*     */   
+/*     */   private int knockbackStrength;
+/*     */   
+/*     */   private boolean hit = false;
+/*     */   
+/*     */   private double dx;
+/*     */   private double dy;
+/*     */   private double dz;
+/*     */   private boolean exp = false;
+/*     */   
+/*     */   public EntityEchoes_sound(World par1World) {
+/*  58 */     super(par1World);
+/*  59 */     this.renderDistanceWeight = 10.0D;
+/*  60 */     setSize(0.5F, 0.5F);
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public EntityEchoes_sound(World par1World, double par2, double par4, double par6) {
+/*  65 */     super(par1World);
+/*  66 */     this.renderDistanceWeight = 10.0D;
+/*  67 */     setSize(0.5F, 0.5F);
+/*  68 */     setPosition(par2, par4, par6);
+/*  69 */     this.yOffset = 0.0F;
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public EntityEchoes_sound(World par1World, EntityLivingBase par2EntityLivingBase, EntityLivingBase par3EntityLivingBase, float par4, float par5) {
+/*  74 */     super(par1World);
+/*  75 */     this.renderDistanceWeight = 10.0D;
+/*  76 */     this.shootingEntity = par2EntityLivingBase;
+/*     */     
+/*  78 */     if (par2EntityLivingBase instanceof EntityPlayer)
+/*     */     {
+/*  80 */       this.canBePickedUp = 1;
+/*     */     }
+/*     */     
+/*  83 */     this.posY = par2EntityLivingBase.posY + par2EntityLivingBase.getEyeHeight() - 0.10000000149011612D;
+/*  84 */     double d0 = par3EntityLivingBase.posX - par2EntityLivingBase.posX;
+/*  85 */     double d1 = par3EntityLivingBase.boundingBox.minY + (par3EntityLivingBase.height / 3.0F) - this.posY;
+/*  86 */     double d2 = par3EntityLivingBase.posZ - par2EntityLivingBase.posZ;
+/*  87 */     double d3 = MathHelper.sqrt_double(d0 * d0 + d2 * d2);
+/*     */     
+/*  89 */     if (d3 >= 1.0E-7D) {
+/*     */       
+/*  91 */       float f2 = (float)(Math.atan2(d2, d0) * 180.0D / Math.PI) - 90.0F;
+/*  92 */       float f3 = (float)-(Math.atan2(d1, d3) * 180.0D / Math.PI);
+/*  93 */       double d4 = d0 / d3;
+/*  94 */       double d5 = d2 / d3;
+/*  95 */       setLocationAndAngles(par2EntityLivingBase.posX + d4, this.posY, par2EntityLivingBase.posZ + d5, f2, f3);
+/*  96 */       this.yOffset = 0.0F;
+/*  97 */       float f4 = (float)d3 * 0.2F;
+/*  98 */       setThrowableHeading(d0, d1 + f4, d2, par4, par5);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */   
+/*     */   public EntityEchoes_sound(World par1World, EntityLivingBase par2EntityLivingBase, float par3) {
+/* 104 */     super(par1World);
+/* 105 */     this.renderDistanceWeight = 10.0D;
+/* 106 */     this.shootingEntity = par2EntityLivingBase;
+/* 107 */     if (par2EntityLivingBase instanceof EntityEchoesAct1) {
+/*     */       
+/* 109 */       this.shootingStandact1 = (EntityEchoesAct1)par2EntityLivingBase;
+/* 110 */       setLocationAndAngles((this.shootingStandact1.getMaster()).posX, (this.shootingStandact1.getMaster()).posY + this.shootingStandact1.getMaster().getEyeHeight(), (this.shootingStandact1.getMaster()).posZ, (this.shootingStandact1.getMaster()).rotationYaw, (this.shootingStandact1.getMaster()).rotationPitch);
+/*     */     }
+/* 112 */     else if (par2EntityLivingBase instanceof EntityEchoesAct2) {
+/*     */       
+/* 114 */       this.shootingStandact2 = (EntityEchoesAct2)par2EntityLivingBase;
+/* 115 */       setLocationAndAngles((this.shootingStandact2.getMaster()).posX, (this.shootingStandact2.getMaster()).posY + this.shootingStandact2.getMaster().getEyeHeight(), (this.shootingStandact2.getMaster()).posZ, (this.shootingStandact2.getMaster()).rotationYaw, (this.shootingStandact2.getMaster()).rotationPitch);
+/*     */     } 
+/*     */ 
+/*     */     
+/* 119 */     if (par2EntityLivingBase instanceof EntityPlayer)
+/*     */     {
+/* 121 */       this.canBePickedUp = 1;
+/*     */     }
+/*     */     
+/* 124 */     setSize(0.5F, 0.5F);
+/* 125 */     this.posX -= (MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
+/* 126 */     this.posY -= 0.10000000149011612D;
+/* 127 */     this.posZ -= (MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * 0.16F);
+/* 128 */     setPosition(this.posX, this.posY, this.posZ);
+/* 129 */     this.yOffset = 0.0F;
+/* 130 */     this.motionX = (-MathHelper.sin(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F));
+/* 131 */     this.motionZ = (MathHelper.cos(this.rotationYaw / 180.0F * 3.1415927F) * MathHelper.cos(this.rotationPitch / 180.0F * 3.1415927F));
+/* 132 */     this.motionY = -MathHelper.sin(this.rotationPitch / 180.0F * 3.1415927F);
+/* 133 */     setThrowableHeading(this.motionX, this.motionY, this.motionZ, par3 * 1.5F, 1.0F);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */   
+/* 138 */   protected void entityInit() { this.dataWatcher.addObject(16, Byte.valueOf((byte)0)); }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setThrowableHeading(double par1, double par3, double par5, float par7, float par8) {
+/* 146 */     float f2 = MathHelper.sqrt_double(par1 * par1 + par3 * par3 + par5 * par5);
+/* 147 */     par1 /= f2;
+/* 148 */     par3 /= f2;
+/* 149 */     par5 /= f2;
+/* 150 */     par1 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : true) * 0.007499999832361937D * par8;
+/* 151 */     par3 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : true) * 0.007499999832361937D * par8;
+/* 152 */     par5 += this.rand.nextGaussian() * (this.rand.nextBoolean() ? -1 : true) * 0.007499999832361937D * par8;
+/* 153 */     par1 *= par7;
+/* 154 */     par3 *= par7;
+/* 155 */     par5 *= par7;
+/* 156 */     this.motionX = par1;
+/* 157 */     this.motionY = par3;
+/* 158 */     this.motionZ = par5;
+/* 159 */     float f3 = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
+/* 160 */     this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(par1, par5) * 180.0D / Math.PI);
+/* 161 */     this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(par3, f3) * 180.0D / Math.PI);
+/* 162 */     this.ticksInGround = 0;
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   @SideOnly(Side.CLIENT)
+/*     */   public void setPositionAndRotation2(double par1, double par3, double par5, float par7, float par8, int par9) {
+/* 173 */     setPosition(par1, par3, par5);
+/* 174 */     setRotation(par7, par8);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   @SideOnly(Side.CLIENT)
+/*     */   public void setVelocity(double par1, double par3, double par5) {
+/* 184 */     this.motionX = par1;
+/* 185 */     this.motionY = par3;
+/* 186 */     this.motionZ = par5;
+/*     */     
+/* 188 */     if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
+/*     */       
+/* 190 */       float f = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
+/* 191 */       this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(par1, par5) * 180.0D / Math.PI);
+/* 192 */       this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(par3, f) * 180.0D / Math.PI);
+/* 193 */       this.prevRotationPitch = this.rotationPitch;
+/* 194 */       this.prevRotationYaw = this.rotationYaw;
+/* 195 */       setLocationAndAngles(this.posX, this.posY, this.posZ, this.rotationYaw, this.rotationPitch);
+/* 196 */       this.ticksInGround = 0;
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void onUpdate() {
+/* 205 */     super.onUpdate();
+/* 206 */     if (this.shootingStandact2 != null && !this.shootingStandact2.tailout)
+/*     */     {
+/* 208 */       setDead();
+/*     */     }
+/*     */     
+/* 211 */     if (this.prevRotationPitch == 0.0F && this.prevRotationYaw == 0.0F) {
+/*     */       
+/* 213 */       float f = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+/* 214 */       this.prevRotationYaw = this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+/* 215 */       this.prevRotationPitch = this.rotationPitch = (float)(Math.atan2(this.motionY, f) * 180.0D / Math.PI);
+/*     */     } 
+/*     */     
+/* 218 */     Block blockA = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+/*     */     
+/* 220 */     if (blockA != Blocks.air) {
+/*     */       
+/* 222 */       blockA.setBlockBoundsBasedOnState(this.worldObj, this.xTile, this.yTile, this.zTile);
+/* 223 */       AxisAlignedBB axisalignedbb = blockA.getCollisionBoundingBoxFromPool(this.worldObj, this.xTile, this.yTile, this.zTile);
+/*     */       
+/* 225 */       if (axisalignedbb != null && axisalignedbb.isVecInside(Vec3.createVectorHelper(this.posX, this.posY, this.posZ)))
+/*     */       {
+/* 227 */         this.inGround = true;
+/*     */       }
+/*     */     } 
+/*     */     
+/* 231 */     if (this.arrowShake > 0)
+/*     */     {
+/* 233 */       this.arrowShake--;
+/*     */     }
+/*     */     
+/* 236 */     if (this.inGround) {
+/*     */       
+/* 238 */       if (this.shootingStandact2 != null) {
+/*     */         
+/* 240 */         if (this.shootingStandact2.windat)
+/*     */         {
+/* 242 */           for (int i1 = 0; i1 < this.worldObj.loadedEntityList.size(); i1++) {
+/*     */             
+/* 244 */             Entity entityplayer1 = (Entity)this.worldObj.loadedEntityList.get(i1);
+/* 245 */             double dst = entityplayer1.getDistanceSq(this.posX, this.posY, this.posZ);
+/* 246 */             if (dst <= 5.0D)
+/*     */             {
+/* 248 */               if (!(entityplayer1 instanceof EntityEchoes_sound))
+/*     */               {
+/* 250 */                 entityplayer1.motionY = 0.8D;
+/*     */               }
+/*     */             }
+/*     */           } 
+/*     */         }
+/* 255 */         if (this.shootingStandact2.exat) {
+/*     */           
+/* 257 */           for (int i1 = 0; i1 < this.worldObj.loadedEntityList.size(); i1++) {
+/*     */             
+/* 259 */             Entity entityplayer1 = (Entity)this.worldObj.loadedEntityList.get(i1);
+/* 260 */             double dst = entityplayer1.getDistanceSq(this.posX, this.posY, this.posZ);
+/* 261 */             if (dst <= 5.0D)
+/*     */             {
+/* 263 */               if (!(entityplayer1 instanceof EntityEchoes_sound))
+/*     */               {
+/* 265 */                 this.exp = true;
+/*     */               }
+/*     */             }
+/*     */           } 
+/* 269 */           if (this.exp)
+/*     */           {
+/* 271 */             this.shootingStandact2.tailout = false;
+/* 272 */             this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 3.0F, true);
+/*     */           }
+/*     */         
+/*     */         } 
+/*     */       } 
+/*     */     } else {
+/*     */       
+/* 279 */       this.ticksInAir++;
+/* 280 */       if (this.ticksInAir >= 10)
+/*     */       {
+/* 282 */         setDead();
+/*     */       }
+/* 284 */       Vec3 vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
+/* 285 */       Vec3 vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+/* 286 */       MovingObjectPosition movingobjectposition = this.worldObj.rayTraceBlocks(vec3, vec31, false);
+/* 287 */       vec3 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
+/* 288 */       vec31 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+/*     */       
+/* 290 */       if (movingobjectposition != null)
+/*     */       {
+/* 292 */         vec31 = Vec3.createVectorHelper(movingobjectposition.hitVec.xCoord, movingobjectposition.hitVec.yCoord, movingobjectposition.hitVec.zCoord);
+/*     */       }
+/*     */       
+/* 295 */       Entity entity = null;
+/* 296 */       List list = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+/* 297 */       double d0 = 0.0D;
+/*     */       
+/*     */       int l;
+/*     */       
+/* 301 */       for (l = 0; l < list.size(); l++) {
+/*     */         
+/* 303 */         Entity entity1 = (Entity)list.get(l);
+/*     */         
+/* 305 */         if (entity1.canBeCollidedWith() && (entity1 != this.shootingEntity || this.ticksInAir >= 5)) {
+/*     */           
+/* 307 */           float f1 = 0.3F;
+/* 308 */           AxisAlignedBB axisalignedbb1 = entity1.boundingBox.expand(f1, f1, f1);
+/* 309 */           MovingObjectPosition movingobjectposition1 = axisalignedbb1.calculateIntercept(vec3, vec31);
+/*     */           
+/* 311 */           if (movingobjectposition1 != null) {
+/*     */             
+/* 313 */             double d1 = vec3.distanceTo(movingobjectposition1.hitVec);
+/*     */             
+/* 315 */             if (d1 < d0 || d0 == 0.0D) {
+/*     */               
+/* 317 */               entity = entity1;
+/* 318 */               d0 = d1;
+/*     */             } 
+/*     */           } 
+/*     */         } 
+/*     */       } 
+/*     */       
+/* 324 */       if (entity != null)
+/*     */       {
+/* 326 */         movingobjectposition = new MovingObjectPosition(entity);
+/*     */       }
+/*     */       
+/* 329 */       if (movingobjectposition != null && movingobjectposition.entityHit != null && movingobjectposition.entityHit instanceof EntityPlayer) {
+/*     */         
+/* 331 */         EntityPlayer entityplayer = (EntityPlayer)movingobjectposition.entityHit;
+/*     */         
+/* 333 */         if (entityplayer.capabilities.disableDamage || (this.shootingEntity instanceof EntityPlayer && !((EntityPlayer)this.shootingEntity).canAttackPlayer(entityplayer)))
+/*     */         {
+/* 335 */           movingobjectposition = null;
+/*     */         }
+/*     */       } 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 342 */       if (movingobjectposition != null)
+/*     */       {
+/* 344 */         if (movingobjectposition.entityHit != null) {
+/*     */           
+/* 346 */           if (!this.worldObj.isRemote)
+/*     */           {
+/* 348 */             if (this.shootingStandact1 != null) {
+/*     */               
+/* 350 */               if (this.shootingStandact1.getMaster() != null && movingobjectposition.entityHit == this.shootingStandact1.getMaster()) {
+/*     */                 
+/* 352 */                 movingobjectposition = null;
+/*     */               }
+/*     */               else {
+/*     */                 
+/* 356 */                 this.worldObj.spawnParticle("largeexplode", this.posX, this.posY, this.posZ, 1.0D, 0.0D, 0.0D);
+/* 357 */                 if (movingobjectposition.entityHit instanceof EntityLivingBase)
+/*     */                 {
+/* 359 */                   this.worldObj.playSoundAtEntity(this, "jojo:Act1_", 1.0F, 1.0F);
+/* 360 */                   ((EntityLivingBase)movingobjectposition.entityHit).addPotionEffect(new PotionEffect(Potion.confusion.getId(), 100, 2));
+/* 361 */                   ((EntityLivingBase)movingobjectposition.entityHit).addPotionEffect(new PotionEffect(Potion.weakness.getId(), 100, true));
+/* 362 */                   setDead();
+/*     */                 }
+/*     */               
+/*     */               } 
+/* 366 */             } else if (this.shootingStandact2 != null) {
+/*     */               
+/* 368 */               if (this.shootingStandact2.getMaster() != null && movingobjectposition.entityHit == this.shootingStandact2.getMaster())
+/*     */               {
+/* 370 */                 movingobjectposition = null;
+/*     */               }
+/*     */               else
+/*     */               {
+/* 374 */                 this.worldObj.spawnParticle("largeexplode", this.posX, this.posY, this.posZ, 1.0D, 0.0D, 0.0D);
+/* 375 */                 if (movingobjectposition.entityHit instanceof EntityLivingBase)
+/*     */                 {
+/* 377 */                   if (this.shootingStandact2.windat) {
+/*     */                     
+/* 379 */                     movingobjectposition.entityHit.motionX += this.motionX;
+/* 380 */                     movingobjectposition.entityHit.motionY += this.motionY + 0.8D;
+/* 381 */                     movingobjectposition.entityHit.motionZ += this.motionZ;
+/*     */                   }
+/* 383 */                   else if (this.shootingStandact2.exat) {
+/*     */                     
+/* 385 */                     this.worldObj.createExplosion(this, this.posX, this.posY, this.posZ, 2.0F, true);
+/*     */                   }
+/* 387 */                   else if (this.shootingStandact2.fireat) {
+/*     */                     
+/* 389 */                     movingobjectposition.entityHit.setFire(10);
+/*     */                   } 
+/* 391 */                   setDead();
+/* 392 */                   this.shootingStandact2.tailout = false;
+/*     */                 }
+/*     */               
+/*     */               }
+/*     */             
+/*     */             } 
+/*     */           }
+/*     */         } else {
+/*     */           
+/* 401 */           this.xTile = movingobjectposition.blockX;
+/* 402 */           this.yTile = movingobjectposition.blockY;
+/* 403 */           this.zTile = movingobjectposition.blockZ;
+/* 404 */           this.inTile = this.worldObj.getBlock(this.xTile, this.yTile, this.zTile);
+/* 405 */           this.inData = this.worldObj.getBlockMetadata(this.xTile, this.yTile, this.zTile);
+/* 406 */           this.motionX = (float)(movingobjectposition.hitVec.xCoord - this.posX);
+/* 407 */           this.motionY = (float)(movingobjectposition.hitVec.yCoord - this.posY);
+/* 408 */           this.motionZ = (float)(movingobjectposition.hitVec.zCoord - this.posZ);
+/* 409 */           float f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionY * this.motionY + this.motionZ * this.motionZ);
+/* 410 */           this.posX -= this.motionX / f2 * 0.05000000074505806D;
+/* 411 */           this.posY -= this.motionY / f2 * 0.05000000074505806D;
+/* 412 */           this.posZ -= this.motionZ / f2 * 0.05000000074505806D;
+/* 413 */           this.inGround = true;
+/* 414 */           this.arrowShake = 7;
+/* 415 */           setIsCritical(false);
+/* 416 */           int p = 3;
+/* 417 */           Block block = this.inTile;
+/* 418 */           if (this.shootingStandact2 != null) {
+/*     */             
+/* 420 */             if (!this.worldObj.isRemote)
+/*     */             {
+/* 422 */               if (this.shootingStandact2.fireat) {
+/*     */                 
+/* 424 */                 this.shootingStandact2.tailout = false;
+/* 425 */                 if (!this.worldObj.isRemote)
+/*     */                 {
+/* 427 */                   switch (movingobjectposition.sideHit) {
+/*     */                     
+/*     */                     case 1:
+/* 430 */                       this.worldObj.setBlock(this.xTile, this.yTile + 1, this.zTile, Blocks.fire);
+/*     */                       break;
+/*     */                     
+/*     */                     case 0:
+/* 434 */                       this.worldObj.setBlock(this.xTile, this.yTile - 1, this.zTile, Blocks.fire);
+/*     */                       break;
+/*     */                     
+/*     */                     case 2:
+/* 438 */                       this.worldObj.setBlock(this.xTile, this.yTile, this.zTile - 1, Blocks.fire);
+/*     */                       break;
+/*     */                     
+/*     */                     case 3:
+/* 442 */                       this.worldObj.setBlock(this.xTile, this.yTile, this.zTile + 1, Blocks.fire);
+/*     */                       break;
+/*     */                     
+/*     */                     case 5:
+/* 446 */                       this.worldObj.setBlock(this.xTile - 1, this.yTile, this.zTile, Blocks.fire);
+/*     */                       break;
+/*     */                     
+/*     */                     case 4:
+/* 450 */                       this.worldObj.setBlock(this.xTile + 1, this.yTile, this.zTile, Blocks.fire);
+/*     */                       break;
+/*     */                   } 
+/*     */                 
+/*     */                 }
+/*     */               } 
+/*     */             }
+/* 457 */           } else if (this.shootingStandact1 != null) {
+/*     */             
+/* 459 */             setDead();
+/*     */           } 
+/*     */           
+/* 462 */           if (this.inTile != Blocks.air)
+/*     */           {
+/* 464 */             this.inTile.onEntityCollidedWithBlock(this.worldObj, this.xTile, this.yTile, this.zTile, this);
+/*     */           }
+/*     */         } 
+/*     */       }
+/*     */       
+/* 469 */       if (getIsCritical())
+/*     */       {
+/* 471 */         for (l = 0; l < 4; l++)
+/*     */         {
+/* 473 */           this.worldObj.spawnParticle("crit", this.posX + this.motionX * l / 4.0D, this.posY + this.motionY * l / 4.0D, this.posZ + this.motionZ * l / 4.0D, -this.motionX, -this.motionY + 0.2D, -this.motionZ);
+/*     */         }
+/*     */       }
+/*     */       
+/* 477 */       this.posX += this.motionX;
+/* 478 */       this.posY += this.motionY;
+/* 479 */       this.posZ += this.motionZ;
+/* 480 */       float f2 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
+/* 481 */       this.rotationYaw = (float)(Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+/*     */       
+/* 483 */       for (this.rotationPitch = (float)(Math.atan2(this.motionY, f2) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F);
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */       
+/* 488 */       while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+/*     */       {
+/* 490 */         this.prevRotationPitch += 360.0F;
+/*     */       }
+/*     */       
+/* 493 */       while (this.rotationYaw - this.prevRotationYaw < -180.0F)
+/*     */       {
+/* 495 */         this.prevRotationYaw -= 360.0F;
+/*     */       }
+/*     */       
+/* 498 */       while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
+/*     */       {
+/* 500 */         this.prevRotationYaw += 360.0F;
+/*     */       }
+/*     */       
+/* 503 */       this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
+/* 504 */       this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
+/* 505 */       float f4 = 0.99F;
+/* 506 */       float f1 = 0.05F;
+/*     */       
+/* 508 */       if (isInWater()) {
+/*     */         
+/* 510 */         for (int j1 = 0; j1 < 4; j1++) {
+/*     */           
+/* 512 */           float f3 = 0.25F;
+/* 513 */           this.worldObj.spawnParticle("bubble", this.posX - this.motionX * f3, this.posY - this.motionY * f3, this.posZ - this.motionZ * f3, this.motionX, this.motionY, this.motionZ);
+/*     */         } 
+/*     */         
+/* 516 */         f4 = 0.8F;
+/*     */       } 
+/*     */       
+/* 519 */       this.motionX *= f4;
+/* 520 */       this.motionY *= f4;
+/* 521 */       this.motionZ *= f4;
+/* 522 */       this.motionY -= f1;
+/* 523 */       setPosition(this.posX, this.posY, this.posZ);
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
+/* 532 */     par1NBTTagCompound.setShort("xTile", (short)this.xTile);
+/* 533 */     par1NBTTagCompound.setShort("yTile", (short)this.yTile);
+/* 534 */     par1NBTTagCompound.setShort("zTile", (short)this.zTile);
+/* 535 */     par1NBTTagCompound.setByte("inTile", (byte)this.inTile.getIdFromBlock(this.inTile));
+/* 536 */     par1NBTTagCompound.setByte("inData", (byte)this.inData);
+/* 537 */     par1NBTTagCompound.setByte("shake", (byte)this.arrowShake);
+/* 538 */     par1NBTTagCompound.setByte("inGround", (byte)(this.inGround ? 1 : 0));
+/* 539 */     par1NBTTagCompound.setByte("pickup", (byte)this.canBePickedUp);
+/* 540 */     par1NBTTagCompound.setDouble("damage", this.damage);
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
+/* 548 */     this.xTile = par1NBTTagCompound.getShort("xTile");
+/* 549 */     this.yTile = par1NBTTagCompound.getShort("yTile");
+/* 550 */     this.zTile = par1NBTTagCompound.getShort("zTile");
+/* 551 */     this.inTile = Block.getBlockById(par1NBTTagCompound.getByte("inTile"));
+/* 552 */     this.inData = par1NBTTagCompound.getByte("inData") & 0xFF;
+/* 553 */     this.arrowShake = par1NBTTagCompound.getByte("shake") & 0xFF;
+/* 554 */     this.inGround = (par1NBTTagCompound.getByte("inGround") == 1);
+/*     */     
+/* 556 */     if (par1NBTTagCompound.hasKey("damage"))
+/*     */     {
+/* 558 */       this.damage = par1NBTTagCompound.getDouble("damage");
+/*     */     }
+/*     */     
+/* 561 */     if (par1NBTTagCompound.hasKey("pickup")) {
+/*     */       
+/* 563 */       this.canBePickedUp = par1NBTTagCompound.getByte("pickup");
+/*     */     }
+/* 565 */     else if (par1NBTTagCompound.hasKey("player")) {
+/*     */       
+/* 567 */       this.canBePickedUp = par1NBTTagCompound.getBoolean("player") ? 1 : 0;
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 577 */   protected boolean canTriggerWalking() { return false; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   @SideOnly(Side.CLIENT)
+/* 583 */   public float getShadowSize() { return 0.5F; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 588 */   public void setDamage(double par1) { this.damage = par1; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 593 */   public double getDamage() { return this.damage; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 601 */   public void setKnockbackStrength(int par1) { this.knockbackStrength = par1; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/* 609 */   public boolean canAttackWithItem() { return false; }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public void setIsCritical(boolean par1) {
+/* 617 */     byte b0 = this.dataWatcher.getWatchableObjectByte(16);
+/*     */     
+/* 619 */     if (par1) {
+/*     */       
+/* 621 */       this.dataWatcher.updateObject(16, Byte.valueOf((byte)(b0 | true)));
+/*     */     }
+/*     */     else {
+/*     */       
+/* 625 */       this.dataWatcher.updateObject(16, Byte.valueOf((byte)(b0 & 0xFFFFFFFE)));
+/*     */     } 
+/*     */   }
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */ 
+/*     */   
+/*     */   public boolean getIsCritical() {
+/* 634 */     byte b0 = this.dataWatcher.getWatchableObjectByte(16);
+/* 635 */     return ((b0 & true) != 0);
+/*     */   }
+/*     */ }
+
+
+/* Location:              /Volumes/NO NAME/JojoBAdv-0.2.4-1.7.10-deobf.jar!/src/jojobadv/Entities/Stands/EntityEchoes_sound.class
+ * Java compiler version: 6 (50.0)
+ * JD-Core Version:       1.0.2
+ */
